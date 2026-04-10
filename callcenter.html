@@ -1,0 +1,2693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prince Alex Digital - Call Center System</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0a0e27;
+            --secondary-bg: #141b3d;
+            --accent-bg: #1e2952;
+            --card-bg: #1a2142;
+            --text-primary: #e8eaf6;
+            --text-secondary: #9fa8da;
+            --accent-blue: #5c6bc0;
+            --accent-green: #26a69a;
+            --accent-red: #ef5350;
+            --accent-orange: #ff9800;
+            --border-color: #2a3866;
+            --hover-bg: #253156;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            font-family: 'Space Mono', monospace;
+            letter-spacing: -0.5px;
+        }
+
+        .logo p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 0.875rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover {
+            background: var(--hover-bg);
+            border-left-color: var(--accent-blue);
+        }
+
+        .nav-item.active {
+            background: var(--accent-bg);
+            border-left-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-header h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.4s ease;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-blue);
+        }
+
+        .stat-card.green::before { background: var(--accent-green); }
+        .stat-card.orange::before { background: var(--accent-orange); }
+        .stat-card.red::before { background: var(--accent-red); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2bbbad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #6674ce;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f44336;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-blue);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--accent-bg);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.9);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Call Display */
+        .call-display {
+            background: linear-gradient(135deg, var(--accent-bg) 0%, var(--card-bg) 100%);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 0.5s ease;
+        }
+
+        .call-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .call-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .call-info-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .call-info-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success { background: rgba(38, 166, 154, 0.2); color: var(--accent-green); }
+        .badge-warning { background: rgba(255, 152, 0, 0.2); color: var(--accent-orange); }
+        .badge-danger { background: rgba(239, 83, 80, 0.2); color: var(--accent-red); }
+        .badge-info { background: rgba(92, 107, 192, 0.2); color: var(--accent-blue); }
+
+        /* Script Content Display */
+        .script-body-display {
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 0.75rem;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .script-placeholder {
+            color: var(--accent-orange);
+            font-weight: 700;
+            background: rgba(255, 152, 0, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        /* Enhanced Notifications */
+        .notification-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+
+        .notification {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color); border-left: 4px solid var(--accent-green);
+            border-radius: 10px; padding: 1rem 1.25rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 350px; pointer-events: auto;
+            display: flex; align-items: flex-start; gap: 0.75rem;
+        }
+        .notification-icon { font-size: 1.25rem; }
+
+        .notification.error {
+            border-left-color: var(--accent-red);
+        }
+
+        .notification.warning {
+            border-left-color: var(--accent-orange);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from { 
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-green);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent-green);
+            background: var(--hover-bg);
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Auth Screen */
+        .auth-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 39, 0.95);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        .agent-info-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="notification-container" class="notification-container"></div>
+    
+    <!-- Confirmation Overlay -->
+    <div id="confirm-overlay" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 id="confirm-title" class="modal-title" style="margin-bottom: 1rem;">Confirm Action</h3>
+            <p id="confirm-message" style="margin-bottom: 2rem; color: var(--text-secondary); line-height: 1.5;"></p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button id="confirm-yes" class="btn btn-primary">Yes, Proceed</button>
+                <button id="confirm-no" class="btn btn-outline">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form/Input Overlay -->
+    <div id="input-overlay" class="modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h3 id="input-title" class="modal-title" style="margin-bottom: 1.5rem;">Input Required</h3>
+            <div id="input-fields-container"></div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                <button id="input-submit" class="btn btn-primary">Save Changes</button>
+                <button id="input-cancel" class="btn btn-outline">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Overlay -->
+    <div id="auth-screen" class="auth-screen hidden">
+        <div class="card" style="max-width: 400px; width: 100%; margin-bottom: 0; position: relative;">
+            <button class="modal-close" style="position: absolute; top: 1rem; right: 1rem;" onclick="hideLoginModal()">&times;</button>
+            <div class="logo" style="border: none; text-align: center; margin-bottom: 1.5rem; padding: 0;">
+                <h1 style="font-size: 1.5rem;">AGENT LOGIN</h1>
+                <p>Prince Alex Digital Call Center</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="loginEmail" class="form-input" placeholder="agent@princealex.pro">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">Sign In</button>
+            <div id="loginError" style="color: var(--accent-red); font-size: 0.8rem; margin-top: 1rem; text-align: center;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>PRINCE ALEX</h1>
+                <p>Call Center System</p>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" data-page="call-page">
+                    <span class="nav-icon">📞</span>
+                    <span>Call Page</span>
+                </div>
+                <div class="nav-item" data-page="customers">
+                    <span class="nav-icon">👤</span>
+                    <span>Customers / Leads</span>
+                </div>
+                <div class="nav-item" data-page="scripts">
+                    <span class="nav-icon">📄</span>
+                    <span>Call Scripts</span>
+                </div>
+                <div class="nav-item" data-page="queues">
+                    <span class="nav-icon">📋</span>
+                    <span>Call Queues</span>
+                </div>
+                <div class="nav-item" data-page="agents">
+                    <span class="nav-icon">👥</span>
+                    <span>Agents</span>
+                </div>
+                <div class="nav-item" data-page="assignments">
+                    <span class="nav-icon">🔗</span>
+                    <span>Agent-Queue Assignment</span>
+                </div>
+                <div class="nav-item" data-page="history">
+                    <span class="nav-icon">📊</span>
+                    <span>Call History</span>
+                </div>
+            </nav>
+            <div class="sidebar-footer" id="sidebarFooter">
+                <div id="logged-in-status" class="agent-info-compact hidden">
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">Logged in as:</div>
+                    <div id="currentAgentName" style="font-weight: 700; color: var(--accent-green); font-family: 'Space Mono', monospace;">-</div>
+                    <button class="btn btn-outline" style="padding: 0.4rem; font-size: 0.75rem; width: 100%; margin-top: 0.5rem;" onclick="handleLogout()">Logout</button>
+                </div>
+                <div id="logged-out-status" class="agent-info-compact">
+                    <button class="btn btn-primary" style="padding: 0.6rem; font-size: 0.85rem; width: 100%;" onclick="showLoginModal()">Agent Login</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Call Page -->
+            <div id="call-page" class="page-content">
+                <div class="page-header">
+                    <h2>Call Page - Make a Call</h2>
+                    <p>Press "Get Next Call" to receive your next assigned contact</p>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCallsToday">0</div>
+                        <div class="stat-label">Total Calls Today</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-value" id="answeredCalls">0</div>
+                        <div class="stat-label">Answered Calls</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-value" id="missedCalls">0</div>
+                        <div class="stat-label">Missed Calls</div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-value" id="salesCompleted">0</div>
+                        <div class="stat-label">Sales Completed</div>
+                    </div>
+                </div>
+
+                <!-- Get Next Call -->
+                <div class="card" id="getCallSection" style="display: none; text-align: center; padding: 5rem 2rem;">
+                    <div class="card-header" style="justify-content: center;">
+                        <h3 class="card-title">Ready for Your Next Call?</h3>
+                    </div>
+                    <button class="btn btn-primary" onclick="getNextCall()" style="font-size: 1.25rem; padding: 1.25rem 3rem; border-radius: 50px; box-shadow: 0 10px 20px rgba(38, 166, 154, 0.2);">
+                        📞 Get Next Call
+                    </button>
+                </div>
+
+                <!-- Active Call Display -->
+                <div id="activeCallSection" style="display: none;">
+                    <div class="call-display">
+                        <div class="call-info-grid">
+                            <div class="call-info-item">
+                                <div class="call-info-label">Customer Name</div>
+                                <div class="call-info-value" id="callCustomerName">-</div>
+                            </div>
+                            <div class="call-info-item">
+                                <div class="call-info-label">Phone Number</div>
+                                <div class="call-info-value" id="callPhoneNumber">-</div>
+                            </div>
+                            <div class="call-info-item">
+                                <div class="call-info-label">Queue</div>
+                                <div class="call-info-value" id="callQueue">-</div>
+                            </div>
+                        </div>
+
+                        <div id="callScriptSection" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                            <div class="call-info-label" style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span>📄 Live Call Script</span>
+                                <span class="badge badge-success" id="callScriptName" style="font-size: 0.65rem;">Standard</span>
+                            </div>
+                            <div class="script-body-display" id="callScriptText">...</div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="startCallBtn" onclick="startCall()">Start Call</button>
+                            <button class="btn btn-danger" id="endCallBtn" onclick="endCall()" style="display: none;">End Call</button>
+                            <button class="btn btn-outline" onclick="skipCall()">Skip Call</button>
+                        </div>
+                    </div>
+
+                    <div class="card" id="callOutcomeSection" style="display: none;">
+                        <div class="card-header">
+                            <h3 class="card-title">Call Outcome</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Outcome</label>
+                            <select id="callOutcome" class="form-select">
+                                <option value="">-- Select Outcome --</option>
+                                <option value="Answered">Answered</option>
+                                <option value="No Answer">No Answer</option>
+                                <option value="Call Back">Call Back</option>
+                                <option value="Wrong Number">Wrong Number</option>
+                                <option value="Not Interested">Not Interested</option>
+                                <option value="Sale Completed">Sale Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea id="callNotes" class="form-textarea" placeholder="Enter call notes..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveCallOutcome()">Save Call Record</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers / Leads Page -->
+            <div id="customers" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Customers / Leads Management</h2>
+                    <p>Upload and manage contact leads for call queues</p>
+                </div>
+
+                <!-- Queue Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="leadsWaiting">0</div>
+                        <div class="stat-label">Customers Waiting</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-value" id="leadsInProgress">0</div>
+                        <div class="stat-label">Calls In Progress</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-value" id="leadsCompleted">0</div>
+                        <div class="stat-label">Completed Calls</div>
+                    </div>
+                    <div class="stat-card orange">
+                        <div class="stat-value" id="leadsCallbacks">0</div>
+                        <div class="stat-label">Pending Callbacks</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <!-- Manual Entry -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Add Customer Manually</h3>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Customer Name</label>
+                            <input type="text" id="leadName" class="form-input" placeholder="Enter name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" id="leadPhone" class="form-input" placeholder="Enter phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="leadEmail" class="form-input" placeholder="Enter email">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" id="leadLocation" class="form-input" placeholder="Enter location">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Queue</label>
+                            <select id="leadQueue" class="form-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea id="leadNotes" class="form-textarea" placeholder="Add notes..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addLeadManually()">Add Lead</button>
+                    </div>
+
+                    <!-- Bulk Upload -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Bulk Upload Leads</h3>
+                        </div>
+                        <div class="help-text" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                            Accepts .csv or .xlsx. Headers: customerName, phoneNumber, email, location, queueName, notes
+                        </div>
+                        <div class="file-upload" onclick="document.getElementById('bulkLeadFile').click()">
+                            <input type="file" id="bulkLeadFile" accept=".csv, .xlsx, .xls">
+                            <div>📁 Click to upload CSV or Excel</div>
+                            <div id="bulkLeadFileName" style="margin-top: 0.5rem; color: var(--accent-green);"></div>
+                        </div>
+                        <div id="uploadProgress" class="hidden" style="margin-top: 1rem;">
+                            <div class="spinner" style="width: 20px; height: 20px; margin: 0.5rem 0;"></div>
+                            <span id="uploadStatus">Processing...</span>
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 1.5rem; width: 100%;" onclick="processBulkLeads()">Upload Leads</button>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Manage Leads</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Search</label>
+                            <input type="text" id="leadSearch" class="form-input" placeholder="Name or Phone" onkeyup="filterLeads()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Queue</label>
+                            <select id="filterLeadQueue" class="form-select" onchange="filterLeads()">
+                                <option value="">All Queues</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="filterLeadStatus" class="form-select" onchange="filterLeads()">
+                                <option value="">All Statuses</option>
+                                <option value="waiting">Waiting</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="skipped">Skipped</option>
+                                <option value="callback">Callback</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Phone</th>
+                                    <th>Queue</th>
+                                    <th>Status</th>
+                                    <th>Agent</th>
+                                    <th>Date Added</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Scripts Page -->
+            <div id="scripts" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Call Scripts</h2>
+                    <p>Manage scripts for your call queues</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upload Script</h3>
+                    </div>
+                    <div style="background: var(--accent-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-blue);">
+                        <p style="font-size: 0.85rem; font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem;">💡 Recommended Script Structure (TXT/PDF/DOCX):</p>
+                        <pre style="font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4; white-space: pre-wrap;">
+1. INTRODUCTION: "Hello {{customerName}}, this is {{agentName}} calling from..."
+2. PURPOSE: "I am reaching out regarding your recent interest in..."
+3. DISCOVERY: "Are you currently looking for a solution to..."
+4. OBJECTION HANDLING: "I understand, however our platform provides..."
+5. CLOSING: "Would you like to schedule a demo for next Tuesday?"
+                        </pre>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Script Name</label>
+                        <input type="text" id="scriptName" class="form-input" placeholder="Enter script name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Queue</label>
+                        <select id="scriptQueue" class="form-select">
+                            <option value="">-- Select Queue --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="scriptDescription" class="form-textarea" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Script Content</label>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Use placeholders like <b>{{customerName}}</b>, <b>{{agentName}}</b>, or <b>{{queueName}}</b></p>
+                        <textarea id="scriptBody" class="form-textarea" style="min-height: 250px; font-family: 'DM Sans', sans-serif;" placeholder="Hello {{customerName}}, my name is {{agentName}}..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="uploadScript()">Save Script</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Scripts List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Script Name</th>
+                                    <th>Queue</th>
+                                    <th>Description</th>
+                                    <th>Upload Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scriptsTableBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">
+                                        <div class="empty-state-icon">📄</div>
+                                        <div>No scripts uploaded yet</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Queues Page -->
+            <div id="queues" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Call Queues</h2>
+                    <p>Manage your call queues</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Queue</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Queue Name</label>
+                        <input type="text" id="queueName" class="form-input" placeholder="e.g., Sales, Customer Support">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea id="queueDescription" class="form-textarea" placeholder="Enter description"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addQueue()">Add Queue</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Queues List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Queue Name</th>
+                                    <th>Description</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queuesTableBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <div class="empty-state-icon">📋</div>
+                                        <div>No queues created yet</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add Contacts to Queue -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Contact to Queue</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" id="contactCustomerName" class="form-input" placeholder="Enter customer name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" id="contactPhoneNumber" class="form-input" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Queue</label>
+                        <select id="contactQueue" class="form-select">
+                            <option value="">-- Select Queue --</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addContact()">Add Contact</button>
+                </div>
+            </div>
+
+            <!-- Agents Page -->
+            <div id="agents" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Call Center Agents</h2>
+                    <p>Manage your agents</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Agent</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Agent Name</label>
+                        <input type="text" id="agentName" class="form-input" placeholder="Enter agent name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="agentEmail" class="form-input" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="agentPhone" class="form-input" placeholder="Enter phone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Role</label>
+                        <select id="agentRole" class="form-select">
+                            <option value="Agent">Agent</option>
+                            <option value="Team Lead">Team Lead</option>
+                            <option value="Manager">Manager</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addAgent()">Add Agent</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Agents List</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentsTableBody">
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        <div class="empty-state-icon">👥</div>
+                                        <div>No agents added yet</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agent-Queue Assignment Page -->
+            <div id="assignments" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Agent-Queue Assignment</h2>
+                    <p>Assign queues to agents</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Assign Queue to Agent</h3>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Agent</label>
+                        <select id="assignAgent" class="form-select">
+                            <option value="">-- Select Agent --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Queue</label>
+                        <select id="assignQueue" class="form-select">
+                            <option value="">-- Select Queue --</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="assignQueueToAgent()">Assign Queue</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Current Assignments</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th>Queue Name</th>
+                                    <th>Assigned Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assignmentsTableBody">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <div class="empty-state-icon">🔗</div>
+                                        <div>No assignments yet</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call History Page -->
+            <div id="history" class="page-content hidden">
+                <div class="page-header">
+                    <h2>Call History</h2>
+                    <p>View all completed calls</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Search Calls</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" id="searchPhone" class="form-input" placeholder="Search by phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Agent</label>
+                            <select id="searchAgent" class="form-select">
+                                <option value="">All Agents</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Queue</label>
+                            <select id="searchQueueFilter" class="form-select">
+                                <option value="">All Queues</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="searchCalls()">Search</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Call Records</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date/Time</th>
+                                    <th>Agent</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Queue</th>
+                                    <th>Outcome</th>
+                                    <th>Duration</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="8" class="empty-state">
+                                        <div class="empty-state-icon">📊</div>
+                                        <div>No call records yet</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGErPBeQ1Fdx9EHPXOHepoEoOx7P2f57o",
+            authDomain: "princealextravel.firebaseapp.com",
+            projectId: "princealextravel",
+            storageBucket: "princealextravel.firebasestorage.app",
+            messagingSenderId: "947577729462",
+            appId: "1:947577729462:web:dd4b4c7cb4a984c5e3d117"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const auth = getAuth(app);
+
+        // Make Firebase available globally
+        window.db = db;
+        window.storage = storage;
+        window.firestore = { collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, updateDoc, getDoc };
+        window.storageRef = { ref, uploadBytes, getDownloadURL, deleteObject };
+        window.auth = { signInWithEmailAndPassword, onAuthStateChanged, signOut };
+
+        // Global variables
+        let currentAgent = null;
+        let currentCall = null;
+        let callStartTime = null;
+        let allLeads = [];
+
+        window.currentAgent = null;
+        window.currentCall = null;
+        window.callStartTime = null;
+        window.allLeads = [];
+
+        // HELPERS FOR UNDERSTANDABLE MESSAGING
+        const understandableErrorMessage = (error) => {
+            if (typeof error === 'string') return error;
+            switch (error.code) {
+                case 'auth/user-not-found': return "We couldn't find an account with that email address.";
+                case 'auth/wrong-password': return "Incorrect password. Please try again.";
+                case 'auth/invalid-email': return "The email format you entered isn't valid.";
+                case 'auth/user-disabled': return "This account has been disabled. Please contact your manager.";
+                case 'auth/too-many-requests': return "Too many failed attempts. Try again in a few minutes.";
+                case 'permission-denied': return "You don't have the required permissions for this action.";
+                case 'auth/invalid-credential': return "Incorrect email or password. Please check your login details and try again.";
+                default: return error.message || "An unexpected error occurred. Please try again.";
+            }
+        };
+
+        // RETRY LOGIC HELPER
+        const getRetryDelay = (attempt) => {
+            if (attempt === 1) return 1 * 60 * 60 * 1000; // 1 hour
+            if (attempt === 2) return 3 * 60 * 60 * 1000; // 3 hours
+            if (attempt === 3) return 24 * 60 * 60 * 1000; // 24 hours
+            return null; // Max attempts reached
+        };
+
+        // OVERLAY SYSTEM HELPERS
+        window.showConfirmOverlay = function(title, message) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('confirm-overlay');
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
+                
+                const cleanup = (result) => {
+                    overlay.classList.remove('active');
+                    resolve(result);
+                };
+
+                document.getElementById('confirm-yes').onclick = () => cleanup(true);
+                document.getElementById('confirm-no').onclick = () => cleanup(false);
+                overlay.classList.add('active');
+            });
+        };
+
+        window.showFormOverlay = function(title, fields) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('input-overlay');
+                const container = document.getElementById('input-fields-container');
+                document.getElementById('input-title').textContent = title;
+                container.innerHTML = '';
+
+                fields.forEach(f => {
+                    const group = document.createElement('div');
+                    group.className = 'form-group';
+                    group.innerHTML = `
+                        <label class="form-label">${f.label}</label>
+                        ${f.type === 'select' ? 
+                            `<select id="f-${f.id}" class="form-select">${f.options.map(o => `<option value="${o}" ${o === f.value ? 'selected' : ''}>${o}</option>`).join('')}</select>` :
+                            `<input type="${f.type || 'text'}" id="f-${f.id}" class="form-input" value="${f.value || ''}" placeholder="${f.placeholder || ''}">`
+                        }
+                    `;
+                    container.appendChild(group);
+                });
+
+                const cleanup = (result) => {
+                    overlay.classList.remove('active');
+                    resolve(result);
+                };
+
+                document.getElementById('input-submit').onclick = () => {
+                    const data = {};
+                    let valid = true;
+                    fields.forEach(f => {
+                        const val = document.getElementById(`f-${f.id}`).value.trim();
+                        if (!val && f.required) valid = false;
+                        data[f.id] = val;
+                    });
+                    if (valid) cleanup(data);
+                    else showNotification('Please fill in all required fields', 'warning');
+                };
+                document.getElementById('input-cancel').onclick = () => cleanup(null);
+                overlay.classList.add('active');
+            });
+        };
+
+        // AUTHENTICATION UTILS
+        window.showLoginModal = () => document.getElementById('auth-screen').classList.remove('hidden');
+        window.hideLoginModal = () => document.getElementById('auth-screen').classList.add('hidden');
+        
+        window.requireLogin = function() {
+            if (!window.currentAgent) {
+                showNotification('Please login to perform this action', 'warning');
+                showLoginModal();
+                return false;
+            }
+            return true;
+        };
+
+        // AUTHENTICATION LOGIC
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!email || !pass) {
+                errorDiv.textContent = 'Please enter both email and password';
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                errorDiv.textContent = '';
+            } catch (error) {
+                errorDiv.textContent = understandableErrorMessage(error);
+            }
+        };
+
+        window.handleLogout = async function() {
+            try {
+                await signOut(auth);
+                window.currentAgent = null;
+                location.reload(); // Refresh to clear state
+            } catch (error) {
+                showNotification('Logout failed: ' + error.message, 'error');
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                hideLoginModal();
+                document.getElementById('logged-in-status').classList.remove('hidden');
+                document.getElementById('logged-out-status').classList.add('hidden');
+                
+                // Set agent name from display name or email
+                window.currentAgent = user.displayName || user.email.split('@')[0];
+                document.getElementById('currentAgentName').textContent = window.currentAgent;
+                document.getElementById('getCallSection').style.display = 'block';
+                showNotification(`Welcome back, ${window.currentAgent}! Your session is active.`);
+                updateStats();
+            } else {
+                document.getElementById('logged-in-status').classList.add('hidden');
+                document.getElementById('logged-out-status').classList.remove('hidden');
+                document.getElementById('getCallSection').style.display = 'none';
+                window.currentAgent = null;
+            }
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
+                
+                const pageName = this.getAttribute('data-page');
+                document.getElementById(pageName).classList.remove('hidden');
+
+                // Load data when switching pages
+                if (pageName === 'scripts') {
+                    loadScripts();
+                    loadQueuesForSelect('scriptQueue');
+                } else if (pageName === 'queues') {
+                    loadQueues();
+                    loadQueuesForSelect('contactQueue');
+                } else if (pageName === 'customers') {
+                    loadLeads();
+                    loadQueuesForSelect('leadQueue');
+                    loadQueuesForSelect('filterLeadQueue');
+                    updateLeadsStats();
+                } else if (pageName === 'agents') {
+                    loadAgents();
+                } else if (pageName === 'assignments') {
+                    loadAssignments();
+                    loadAgentsForSelect('assignAgent');
+                    loadQueuesForSelect('assignQueue');
+                } else if (pageName === 'history') {
+                    loadCallHistory();
+                    loadAgentsForSelect('searchAgent');
+                    loadQueuesForSelect('searchQueueFilter');
+                } else if (pageName === 'call-page') {
+                    loadAgentsForSelect('agentSelect');
+                    updateStats();
+                }
+            });
+        });
+
+        // Notification system
+        window.showNotification = function(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            const icon = type === 'error' ? '❌' : type === 'warning' ? '⚠️' : '✅';
+            
+            notification.innerHTML = `
+                <div class="notification-icon">${icon}</div>
+                <div class="notification-content">
+                    <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 0.15rem; text-transform: uppercase; opacity: 0.9;">${type}</div>
+                    <div style="font-size: 0.9rem; line-height: 1.4;">${message}</div>
+                </div>
+            `;
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(20px)';
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
+        };
+
+        // AGENTS
+        window.addAgent = async function() {
+            const name = document.getElementById('agentName').value.trim();
+            const email = document.getElementById('agentEmail').value.trim();
+            const phone = document.getElementById('agentPhone').value.trim();
+            const role = document.getElementById('agentRole').value;
+
+            if (!name || !email || !phone) {
+                showNotification('Agent registration failed: Name, Email, and Phone are required.', 'warning');
+                return;
+            }
+
+            try {
+                await window.firestore.addDoc(window.firestore.collection(db, 'agents'), {
+                    agentName: name,
+                    email: email,
+                    phone: phone,
+                    role: role,
+                    status: 'Active',
+                    createdAt: new Date().toISOString()
+                });
+
+                showNotification(`Agent "${name}" has been successfully added to the system.`);
+                document.getElementById('agentName').value = '';
+                document.getElementById('agentEmail').value = '';
+                document.getElementById('agentPhone').value = '';
+                window.cachedAgents = []; // Invalidate cache
+                loadAgents();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadAgents = async function() {
+            try {
+                const tbody = document.getElementById('agentsTableBody');
+                if (window.cachedAgents.length > 0) {
+                    renderAgentsTable(window.cachedAgents);
+                    return;
+                }
+
+                const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'agents'));
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <div>No agents added yet</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                window.cachedAgents = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAgentsTable(window.cachedAgents);
+            } catch (error) {
+                showNotification('Error loading agents: ' + error.message, 'error');
+            }
+        };
+
+        // Helper to render agents table from data
+        window.renderAgentsTable = function(agents) {
+            const tbody = document.getElementById('agentsTableBody');
+            tbody.innerHTML = '';
+            agents.forEach(agent => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${agent.agentName}</td>
+                        <td>${agent.email}</td>
+                        <td>${agent.phone}</td>
+                        <td><span class="badge badge-info">${agent.role}</span></td>
+                        <td><span class="badge badge-success">${agent.status}</span></td>
+                        <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="deleteAgent('${agent.id}')">Delete</button>
+                        </td>
+                    `;
+            });
+        }
+
+        window.deleteAgent = async function(agentId) {
+            if (!await showConfirmOverlay('Delete Agent', 'This will permanently remove the agent from the system. Proceed?')) return;
+
+            try {
+                await window.firestore.deleteDoc(window.firestore.doc(db, 'agents', agentId));
+                showNotification('The agent record has been permanently deleted.');
+                window.cachedAgents = []; // Invalidate cache
+                loadAgents();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadAgentsForSelect = async function(selectId) {
+            try {
+                if (window.cachedAgents.length === 0) {
+                    const snap = await window.firestore.getDocs(window.firestore.collection(db, 'agents'));
+                    window.cachedAgents = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">-- Select Agent --</option>';
+                
+                window.cachedAgents.forEach(agent => {
+                    const option = document.createElement('option');
+                    option.value = agent.agentName;
+                    option.textContent = agent.agentName;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading agents for select:', error);
+            }
+        };
+
+        // QUEUES
+        window.addQueue = async function() {
+            const name = document.getElementById('queueName').value.trim();
+            const description = document.getElementById('queueDescription').value.trim();
+
+            if (!name || !description) {
+                showNotification('Queue creation failed: Please provide both a name and a description.', 'warning');
+                return;
+            }
+
+            try {
+                await window.firestore.addDoc(window.firestore.collection(db, 'queues'), {
+                    queueName: name,
+                    description: description,
+                    createdAt: new Date().toISOString()
+                });
+
+                showNotification(`The "${name}" queue has been created and is ready for leads.`);
+                document.getElementById('queueName').value = '';
+                document.getElementById('queueDescription').value = '';
+                window.cachedQueues = []; // Invalidate cache
+                loadQueues();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadQueues = async function() {
+            try {
+                const tbody = document.getElementById('queuesTableBody');
+                if (window.cachedQueues.length > 0) {
+                    renderQueuesTable(window.cachedQueues);
+                    return;
+                }
+
+                const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'queues'));
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <div>No queues created yet</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                window.cachedQueues = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderQueuesTable(window.cachedQueues);
+            } catch (error) {
+                showNotification('Error loading queues: ' + error.message, 'error');
+            }
+        };
+
+        // Helper to render queues table from data
+        window.renderQueuesTable = function(queues) {
+            const tbody = document.getElementById('queuesTableBody');
+            tbody.innerHTML = '';
+            queues.forEach(queue => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td><strong>${queue.queueName}</strong></td>
+                        <td>${queue.description}</td>
+                        <td>${new Date(queue.createdAt).toLocaleDateString()}</td>
+                        <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="deleteQueue('${queue.id}')">Delete</button>
+                        </td>
+                    `;
+            });
+        }
+
+        window.deleteQueue = async function(queueId) {
+            if (!await showConfirmOverlay('Delete Queue', 'Deleting this queue will disconnect any assigned agents. Proceed?')) return;
+
+            try {
+                await window.firestore.deleteDoc(window.firestore.doc(db, 'queues', queueId));
+                showNotification('Queue deleted successfully.');
+                window.cachedQueues = []; // Invalidate cache
+                loadQueues();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadQueuesForSelect = async function(selectId) {
+            try {
+                if (window.cachedQueues.length === 0) {
+                    const snap = await window.firestore.getDocs(window.firestore.collection(db, 'queues'));
+                    window.cachedQueues = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
+
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">-- Select Queue --</option>';
+                
+                window.cachedQueues.forEach(queue => {
+                    const option = document.createElement('option');
+                    option.value = queue.queueName;
+                    option.textContent = queue.queueName;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading queues for select:', error);
+            }
+        };
+
+        // CONTACTS
+        window.addContact = async function() {
+            const customerName = document.getElementById('contactCustomerName').value.trim();
+            const phoneNumber = document.getElementById('contactPhoneNumber').value.trim();
+            const queueName = document.getElementById('contactQueue').value;
+
+            if (!customerName || !phoneNumber || !queueName) {
+                showNotification('Contact data missing: Name, Phone, and Queue selection are required.', 'warning');
+                return;
+            }
+
+            try {
+                await window.firestore.addDoc(window.firestore.collection(db, 'queueContacts'), {
+                    customerName: customerName,
+                    phoneNumber: phoneNumber,
+                    queueName: queueName,
+                    status: 'waiting',
+                    addedDate: new Date().toISOString()
+                });
+
+                showNotification(`Lead for ${customerName} has been queued for ${queueName}.`);
+                document.getElementById('contactCustomerName').value = '';
+                document.getElementById('contactPhoneNumber').value = '';
+                window.allLeads = []; // Invalidate leads cache
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        // AGENT-QUEUE ASSIGNMENTS
+        window.assignQueueToAgent = async function() {
+            const agentName = document.getElementById('assignAgent').value;
+            const queueName = document.getElementById('assignQueue').value;
+
+            if (!agentName || !queueName) {
+                showNotification('Assignment failed: You must select both an agent and a queue.', 'warning');
+                return;
+            }
+
+            try {
+                // Check if assignment already exists
+                const q = window.firestore.query(
+                    window.firestore.collection(db, 'agentQueues'),
+                    window.firestore.where('agentName', '==', agentName),
+                    window.firestore.where('queueName', '==', queueName)
+                );
+                const existing = await window.firestore.getDocs(q);
+
+                if (!existing.empty) {
+                    showNotification('This agent is already assigned to that specific queue.', 'warning');
+                    return;
+                }
+
+                await window.firestore.addDoc(window.firestore.collection(db, 'agentQueues'), {
+                    agentName: agentName,
+                    queueName: queueName,
+                    assignedDate: new Date().toISOString()
+                });
+
+                showNotification(`Successfully assigned ${agentName} to the ${queueName} queue.`);
+                window.cachedAssignments = []; // Invalidate cache
+                loadAssignments();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadAssignments = async function() {
+            try {
+                const tbody = document.getElementById('assignmentsTableBody');
+                if (window.cachedAssignments.length > 0) {
+                    renderAssignmentsTable(window.cachedAssignments);
+                    return;
+                }
+
+                const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'agentQueues'));
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                <div class="empty-state-icon">🔗</div>
+                                <div>No assignments yet</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                window.cachedAssignments = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderAssignmentsTable(window.cachedAssignments);
+            } catch (error) {
+                showNotification('Error loading assignments: ' + error.message, 'error');
+            }
+        };
+
+        // Helper to render assignments table from data
+        window.renderAssignmentsTable = function(assignments) {
+            const tbody = document.getElementById('assignmentsTableBody');
+            tbody.innerHTML = '';
+            assignments.forEach(assignment => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${assignment.agentName}</td>
+                        <td><span class="badge badge-info">${assignment.queueName}</span></td>
+                        <td>${new Date(assignment.assignedDate).toLocaleDateString()}</td>
+                        <td>
+                        <button class="btn btn-danger" style="padding: 0.5rem 1rem;" onclick="deleteAssignment('${assignment.id}')">Remove</button>
+                        </td>
+                    `;
+            });
+        }
+
+        window.deleteAssignment = async function(assignmentId) {
+            if (!await showConfirmOverlay('Remove Assignment', 'This will stop the agent from receiving calls from this queue. Proceed?')) return;
+
+            try {
+                await window.firestore.deleteDoc(window.firestore.doc(db, 'agentQueues', assignmentId));
+                showNotification('Agent assignment has been removed.');
+                window.cachedAssignments = []; // Invalidate cache
+                loadAssignments();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        // SCRIPTS
+        window.uploadScript = async function() {
+            const scriptName = document.getElementById('scriptName').value.trim();
+            const queueName = document.getElementById('scriptQueue').value;
+            const description = document.getElementById('scriptDescription').value.trim();
+            const scriptBody = document.getElementById('scriptBody').value.trim();
+
+            if (!scriptName || !queueName || !scriptBody) {
+                showNotification('Script upload failed: Name, Queue and Content are required.', 'warning');
+                return;
+            }
+
+            try {
+                // Save directly to Firestore
+                await window.firestore.addDoc(window.firestore.collection(db, 'scripts'), {
+                    scriptName: scriptName,
+                    queueName: queueName,
+                    description: description,
+                    scriptBody: scriptBody,
+                    uploadedBy: window.currentAgent || 'Admin',
+                    uploadDate: new Date().toISOString()
+                });
+
+                showNotification(`The call script "${scriptName}" has been uploaded and linked to ${queueName}.`);
+                document.getElementById('scriptName').value = '';
+                document.getElementById('scriptDescription').value = '';
+                document.getElementById('scriptBody').value = '';
+                window.cachedScripts = []; // Invalidate cache
+                loadScripts();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.loadScripts = async function() {
+            try {
+                const tbody = document.getElementById('scriptsTableBody');
+                if (window.cachedScripts.length > 0) {
+                    renderScriptsTable(window.cachedScripts);
+                    return;
+                }
+
+                const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'scripts'));
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <div class="empty-state-icon">📄</div>
+                                <div>No scripts uploaded yet</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                window.cachedScripts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderScriptsTable(window.cachedScripts);
+            } catch (error) {
+                showNotification('Error loading scripts: ' + error.message, 'error');
+            }
+        };
+
+        // Helper to render scripts table from data
+        window.renderScriptsTable = function(scripts) {
+            const tbody = document.getElementById('scriptsTableBody');
+            tbody.innerHTML = '';
+            scripts.forEach(script => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td><strong>${script.scriptName}</strong></td>
+                        <td><span class="badge badge-info">${script.queueName}</span></td>
+                        <td>${script.description}</td>
+                        <td>${new Date(script.uploadDate).toLocaleDateString()}</td>
+                        <td>
+                            <div class="action-buttons">
+                            <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="viewFullScript('${script.id}')">View</button>
+                            <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteScript('${script.id}')">Delete</button>
+                            </div>
+                        </td>
+                    `;
+            });
+        }
+
+        window.viewFullScript = async function(id) {
+            const q = await window.firestore.getDoc(window.firestore.doc(db, 'scripts', id));
+            if (!q.exists()) return;
+            const data = q.data();
+            alert(`--- ${data.scriptName} ---\n\n${data.scriptBody}`);
+        };
+
+        window.deleteScript = async function(scriptId) {
+            if (!await showConfirmOverlay('Delete Script', 'This will permanently delete the call script. Proceed?')) return;
+
+            try {
+                await window.firestore.deleteDoc(window.firestore.doc(db, 'scripts', scriptId));
+                showNotification('The call script record has been deleted.');
+                window.cachedScripts = []; // Invalidate cache
+                loadScripts();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        // CALL PAGE FUNCTIONS
+        window.startGetCallCooldown = function(btn, originalContent) {
+            let seconds = 7;
+            btn.disabled = true;
+            
+            const timer = setInterval(() => {
+                if (seconds > 0) {
+                    btn.innerHTML = `⏳ Try again in ${seconds}s`;
+                    seconds--;
+                } else {
+                    clearInterval(timer);
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            }, 1000);
+        };
+
+        window.getNextCall = async function() {
+            if (!requireLogin()) return;
+
+            const getCallBtn = document.querySelector('#getCallSection button');
+            const originalBtnContent = getCallBtn.innerHTML;
+
+            try {
+                // Show loading state
+                getCallBtn.disabled = true;
+                getCallBtn.innerHTML = '🔍 Searching for leads...';
+                
+                // Simulate loading/search delay for 2.5 seconds
+                await new Promise(resolve => setTimeout(resolve, 2500));
+
+                // Get agent's assigned queues
+                const queueAssignmentsQuery = window.firestore.query(
+                    window.firestore.collection(db, 'agentQueues'),
+                    window.firestore.where('agentName', '==', window.currentAgent)
+                );
+                const assignedQueues = await window.firestore.getDocs(queueAssignmentsQuery);
+
+                if (assignedQueues.empty) {
+                    showNotification('No queues assigned! Contact an admin to assign you to a queue.', 'warning', 7000);
+                    startGetCallCooldown(getCallBtn, originalBtnContent);
+                    return;
+                }
+
+                const queueNames = [];
+                assignedQueues.forEach(doc => {
+                    queueNames.push(doc.data().queueName);
+                });
+
+                // Find waiting contacts in assigned queues
+                let foundContact = null;
+                let contactDocId = null;
+                const nowISO = new Date().toISOString();
+
+                for (const queueName of queueNames) {
+                    const contactsQuery = window.firestore.query(
+                        window.firestore.collection(db, 'queueContacts'),
+                        window.firestore.where('queueName', '==', queueName),
+                        window.firestore.where('status', 'in', ['waiting', 'callback-scheduled']),
+                        window.firestore.where('nextActionAt', '<=', nowISO),
+                        window.firestore.orderBy('nextActionAt', 'asc')
+                    );
+                    const contacts = await window.firestore.getDocs(contactsQuery);
+
+                    if (!contacts.empty) {
+                        // Get the first (oldest) contact
+                        const firstDoc = contacts.docs[0];
+                        foundContact = firstDoc.data();
+                        contactDocId = firstDoc.id;
+                        break;
+                    }
+                }
+
+                if (!foundContact) {
+                    showNotification('All caught up! No leads are currently due for a call in your assigned queues.', 'warning', 7000);
+                    startGetCallCooldown(getCallBtn, originalBtnContent);
+                    return;
+                }
+
+                // Update contact status to in-progress
+                await window.firestore.updateDoc(window.firestore.doc(db, 'queueContacts', contactDocId), {
+                    status: 'in-progress',
+                    assignedAgent: window.currentAgent
+                });
+
+                // Get script for this queue
+                const scriptsQuery = window.firestore.query(
+                    window.firestore.collection(db, 'scripts'),
+                    window.firestore.where('queueName', '==', foundContact.queueName)
+                );
+                const scripts = await window.firestore.getDocs(scriptsQuery);
+                
+                const scriptData = scripts.empty ? null : scripts.docs[0].data();
+                const scriptName = scriptData ? scriptData.scriptName : 'No script assigned';
+                let scriptBody = scriptData ? scriptData.scriptBody : "Please note: There is no talking script configured for this queue. Conduct the call using standard operating procedures.";
+
+                // Process placeholders
+                const highlights = [
+                    { find: '{{customerName}}', replace: foundContact.customerName },
+                    { find: '{{agentName}}', replace: window.currentAgent },
+                    { find: '{{queueName}}', replace: foundContact.queueName }
+                ];
+
+                highlights.forEach(h => {
+                    scriptBody = scriptBody.split(h.find).join(`<span class="script-placeholder">${h.replace}</span>`);
+                });
+
+                // Display the call
+                window.currentCall = {
+                    ...foundContact,
+                    contactId: contactDocId,
+                    scriptName: scriptName,
+                    scriptBody: scriptBody
+                };
+
+                document.getElementById('callCustomerName').textContent = foundContact.customerName;
+                document.getElementById('callPhoneNumber').textContent = foundContact.phoneNumber;
+                document.getElementById('callQueue').textContent = foundContact.queueName;
+                document.getElementById('callScriptName').textContent = scriptName;
+                document.getElementById('callScriptText').innerHTML = scriptBody;
+
+                document.getElementById('activeCallSection').style.display = 'block';
+                document.getElementById('startCallBtn').style.display = 'inline-block';
+                document.getElementById('endCallBtn').style.display = 'none';
+                document.getElementById('callOutcomeSection').style.display = 'none';
+
+                document.getElementById('getCallSection').style.display = 'none';
+                getCallBtn.disabled = false;
+                getCallBtn.innerHTML = originalBtnContent;
+
+                showNotification('Next call retrieved! Lead information is now on screen.');
+            } catch (error) {
+                getCallBtn.disabled = false;
+                getCallBtn.innerHTML = originalBtnContent;
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.startCall = function() {
+            window.callStartTime = new Date();
+            document.getElementById('startCallBtn').style.display = 'none';
+            document.getElementById('endCallBtn').style.display = 'inline-block';
+            showNotification('Call timer started.');
+        };
+
+        window.endCall = function() {
+            document.getElementById('callOutcomeSection').style.display = 'block';
+            document.getElementById('endCallBtn').style.display = 'none';
+            showNotification('Call ended. Please record the outcome below to proceed.');
+        };
+
+        window.skipCall = async function() {
+            if (!window.currentCall) return;
+
+            if (!await showConfirmOverlay('Skip Call', 'Skip this call? It will be placed back at the front of the queue for the next available agent.')) return;
+
+            try {
+                // Update contact status back to waiting
+                await window.firestore.updateDoc(window.firestore.doc(db, 'queueContacts', window.currentCall.contactId), {
+                    status: 'waiting',
+                    assignedAgent: null,
+                    assignedAgent: null
+                });
+
+                // Reset call display
+                document.getElementById('activeCallSection').style.display = 'none';
+                window.currentCall = null;
+                window.callStartTime = null;
+                window.allLeads = []; // Invalidate leads cache
+
+                showNotification('Call skipped and returned to the queue.');
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.saveCallOutcome = async function() {
+            const outcome = document.getElementById('callOutcome').value;
+            const notes = document.getElementById('callNotes').value.trim();
+
+            if (!outcome) {
+                showNotification('Outcome missing: You must select a result before saving.', 'warning');
+                return;
+            }
+
+            if (!window.currentCall || !window.callStartTime) {
+                showNotification('System Error: Lost call context. Please refresh the page.', 'error');
+                return;
+            }
+
+            let nextActionAt = new Date().toISOString();
+            let newStatus = 'completed';
+            let attemptIncrement = 0;
+
+            // Handle Call Back Scheduling
+            if (outcome === 'Call Back') {
+                const scheduleData = await showFormOverlay('Schedule Callback', [
+                    { id: 'date', label: 'Callback Date', type: 'date', required: true },
+                    { id: 'time', label: 'Callback Time', type: 'time', required: true }
+                ]);
+                
+                if (!scheduleData) return; // User cancelled
+                newStatus = 'callback-scheduled';
+                nextActionAt = new Date(`${scheduleData.date}T${scheduleData.time}`).toISOString();
+            } 
+            // Handle No Answer Retry Logic
+            else if (outcome === 'No Answer') {
+                attemptIncrement = 1;
+                const currentAttempts = (window.currentCall.attemptCount || 0) + 1;
+                const delay = getRetryDelay(currentAttempts);
+                
+                if (delay) {
+                    newStatus = 'waiting';
+                    nextActionAt = new Date(Date.now() + delay).toISOString();
+                    showNotification(`Lead set to retry in ${delay / (60 * 60 * 1000)} hours (Attempt ${currentAttempts}/4)`, 'info');
+                } else {
+                    newStatus = 'failed';
+                    showNotification('Max attempts reached. Lead marked as failed.', 'error');
+                }
+            }
+
+            try {
+                const callEndTime = new Date();
+                const duration = Math.floor((callEndTime - window.callStartTime) / 1000);
+                const timestamp = new Date().toISOString();
+
+                const historyEntry = {
+                    timestamp,
+                    agent: window.currentAgent,
+                    outcome,
+                    duration,
+                    notes
+                };
+
+                // 1. Update Lead Record
+                await window.firestore.updateDoc(window.firestore.doc(db, 'queueContacts', window.currentCall.contactId), {
+                    status: newStatus,
+                    lastOutcome: outcome,
+                    attemptCount: (window.currentCall.attemptCount || 0) + attemptIncrement,
+                    nextActionAt: nextActionAt,
+                    calledDate: timestamp,
+                    callHistory: [...(window.currentCall.callHistory || []), historyEntry]
+                });
+
+                // 2. Log to global call history
+                await window.firestore.addDoc(window.firestore.collection(db, 'calls'), {
+                    ...historyEntry,
+                    customerName: window.currentCall.customerName,
+                    phoneNumber: window.currentCall.phoneNumber,
+                    queue: window.currentCall.queueName,
+                    scriptUsed: window.currentCall.scriptName
+                });
+
+                showNotification('Call record has been successfully logged.');
+
+                // Reset UI
+                document.getElementById('activeCallSection').style.display = 'none';
+                document.getElementById('callOutcome').value = '';
+                document.getElementById('callNotes').value = '';
+                window.currentCall = null;
+                window.callStartTime = null;
+                window.allLeads = []; // Invalidate leads cache
+
+                // Update stats
+                updateStats();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        // CALL HISTORY
+        window.loadCallHistory = async function() {
+            try {
+                const q = window.firestore.query(
+                    window.firestore.collection(db, 'calls'),
+                    window.firestore.orderBy('timestamp', 'desc')
+                );
+                const querySnapshot = await window.firestore.getDocs(q);
+                const tbody = document.getElementById('historyTableBody');
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">📊</div>
+                                <div>No call records yet</div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                querySnapshot.forEach(doc => {
+                    const call = doc.data();
+                    const row = tbody.insertRow();
+                    
+                    const outcomeClass = 
+                        call.callOutcome === 'Answered' || call.callOutcome === 'Sale Completed' ? 'badge-success' :
+                        call.callOutcome === 'No Answer' || call.callOutcome === 'Call Back' ? 'badge-warning' :
+                        'badge-danger';
+
+                    const durationMins = Math.floor(call.duration / 60);
+                    const durationSecs = call.duration % 60;
+
+                    row.innerHTML = `
+                        <td>${new Date(call.timestamp).toLocaleString()}</td>
+                        <td>${call.agentName}</td>
+                        <td>${call.customerName}</td>
+                        <td>${call.phoneNumber}</td>
+                        <td><span class="badge badge-info">${call.queue}</span></td>
+                        <td><span class="badge ${outcomeClass}">${call.callOutcome}</span></td>
+                        <td>${durationMins}m ${durationSecs}s</td>
+                        <td>${call.notes || '-'}</td>
+                    `;
+                });
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.searchCalls = async function() {
+            const phoneSearch = document.getElementById('searchPhone').value.trim();
+            const agentSearch = document.getElementById('searchAgent').value;
+            const queueSearch = document.getElementById('searchQueueFilter').value;
+
+            try {
+                let q = window.firestore.collection(db, 'calls');
+                const constraints = [];
+
+                if (agentSearch) {
+                    constraints.push(window.firestore.where('agentName', '==', agentSearch));
+                }
+                if (queueSearch) {
+                    constraints.push(window.firestore.where('queue', '==', queueSearch));
+                }
+
+                if (constraints.length > 0) {
+                    q = window.firestore.query(q, ...constraints, window.firestore.orderBy('timestamp', 'desc'));
+                } else {
+                    q = window.firestore.query(q, window.firestore.orderBy('timestamp', 'desc'));
+                }
+
+                const querySnapshot = await window.firestore.getDocs(q);
+                const tbody = document.getElementById('historyTableBody');
+                tbody.innerHTML = '';
+
+                let found = 0;
+                querySnapshot.forEach(doc => {
+                    const call = doc.data();
+                    
+                    // Additional phone filter (Firestore doesn't support partial string matching well)
+                    if (phoneSearch && !call.phoneNumber.includes(phoneSearch)) {
+                        return;
+                    }
+
+                    found++;
+                    const row = tbody.insertRow();
+                    
+                    const outcomeClass = 
+                        call.callOutcome === 'Answered' || call.callOutcome === 'Sale Completed' ? 'badge-success' :
+                        call.callOutcome === 'No Answer' || call.callOutcome === 'Call Back' ? 'badge-warning' :
+                        'badge-danger';
+
+                    const durationMins = Math.floor(call.duration / 60);
+                    const durationSecs = call.duration % 60;
+
+                    row.innerHTML = `
+                        <td>${new Date(call.timestamp).toLocaleString()}</td>
+                        <td>${call.agentName}</td>
+                        <td>${call.customerName}</td>
+                        <td>${call.phoneNumber}</td>
+                        <td><span class="badge badge-info">${call.queue}</span></td>
+                        <td><span class="badge ${outcomeClass}">${call.callOutcome}</span></td>
+                        <td>${durationMins}m ${durationSecs}s</td>
+                        <td>${call.notes || '-'}</td>
+                    `;
+                });
+
+                if (found === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <div>No matching calls found</div>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                showNotification(`Search complete: ${found} call record(s) found.`);
+            } catch (error) {
+                showNotification('Error searching calls: ' + error.message, 'error');
+            }
+        };
+
+        // UPDATE STATS
+        window.updateStats = async function() {
+            if (!window.currentAgent) return;
+
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayISO = today.toISOString();
+
+                const q = window.firestore.query(
+                    window.firestore.collection(db, 'calls'),
+                    window.firestore.where('agentName', '==', window.currentAgent)
+                );
+                const querySnapshot = await window.firestore.getDocs(q);
+
+                let totalToday = 0;
+                let answered = 0;
+                let missed = 0;
+                let sales = 0;
+
+                querySnapshot.forEach(doc => {
+                    const call = doc.data();
+                    if (call.timestamp >= todayISO) {
+                        totalToday++;
+                        if (call.callOutcome === 'Answered' || call.callOutcome === 'Sale Completed') {
+                            answered++;
+                        }
+                        if (call.callOutcome === 'No Answer') {
+                            missed++;
+                        }
+                        if (call.callOutcome === 'Sale Completed') {
+                            sales++;
+                        }
+                    }
+                });
+
+                document.getElementById('totalCallsToday').textContent = totalToday;
+                document.getElementById('answeredCalls').textContent = answered;
+                document.getElementById('missedCalls').textContent = missed;
+                document.getElementById('salesCompleted').textContent = sales;
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        };
+
+        // CUSTOMERS / LEADS MANAGEMENT
+        document.getElementById('bulkLeadFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('bulkLeadFileName').textContent = fileName ? `Selected: ${fileName}` : '';
+        });
+
+        window.addLeadManually = async function() {
+            if (!requireLogin()) return;
+            const name = document.getElementById('leadName').value.trim();
+            const phone = document.getElementById('leadPhone').value.trim();
+            const email = document.getElementById('leadEmail').value.trim();
+            const location = document.getElementById('leadLocation').value.trim();
+            const queue = document.getElementById('leadQueue').value;
+            const notes = document.getElementById('leadNotes').value.trim();
+
+            if (!name || !phone || !queue) {
+                showNotification('Lead data missing: Name, Phone, and Queue assignment are required.', 'warning');
+                return;
+            }
+
+            try {
+                const now = new Date().toISOString();
+                await window.firestore.addDoc(window.firestore.collection(db, 'queueContacts'), {
+                    customerName: name,
+                    phoneNumber: phone,
+                    email: email,
+                    location: location,
+                    queueName: queue,
+                    notes: notes,
+                    status: 'waiting',
+                    attemptCount: 0,
+                    nextActionAt: now,
+                    callHistory: [],
+                    assignedAgent: null,
+                    addedDate: now,
+                    calledDate: null
+                });
+
+                showNotification(`Lead for ${name} has been manually added to the ${queue} queue.`);
+                document.getElementById('leadName').value = '';
+                document.getElementById('leadPhone').value = '';
+                document.getElementById('leadEmail').value = '';
+                document.getElementById('leadLocation').value = '';
+                document.getElementById('leadNotes').value = '';
+                window.allLeads = []; // Invalidate cache
+                loadLeads();
+                updateLeadsStats();
+            } catch (error) {
+                showNotification(understandableErrorMessage(error), 'error');
+            }
+        };
+
+        window.processBulkLeads = async function() {
+            if (!requireLogin()) return;
+            const fileInput = document.getElementById('bulkLeadFile');
+            const file = fileInput.files[0];
+            if (!file) { showNotification('Please select a CSV or Excel file to upload.', 'warning'); return; }
+
+            const progress = document.getElementById('uploadProgress');
+            const statusLabel = document.getElementById('uploadStatus');
+            progress.classList.remove('hidden');
+            statusLabel.textContent = 'Reading file...';
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = e.target.result;
+                    let jsonData = [];
+                    if (file.name.endsWith('.csv')) {
+                        const lines = data.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim());
+                        for (let i = 1; i < lines.length; i++) {
+                            if (!lines[i].trim()) continue;
+                            const row = lines[i].split(',');
+                            const obj = {};
+                            headers.forEach((h, idx) => obj[h] = row[idx]?.trim());
+                            jsonData.push(obj);
+                        }
+                    } else {
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    }
+
+                    statusLabel.textContent = `Uploading ${jsonData.length} leads...`;
+                    let count = 0;
+                    const now = new Date().toISOString();
+                    for (const lead of jsonData) {
+                        if (!lead.customerName || !lead.phoneNumber || !lead.queueName) continue;
+                        if (!/^\d+$/.test(String(lead.phoneNumber).replace(/\D/g, ''))) continue;
+
+                        await window.firestore.addDoc(window.firestore.collection(db, 'queueContacts'), {
+                            customerName: lead.customerName,
+                            phoneNumber: String(lead.phoneNumber),
+                            email: lead.email || '',
+                            location: lead.location || '',
+                            queueName: lead.queueName,
+                            notes: lead.notes || '',
+                            status: 'waiting',
+                            attemptCount: 0,
+                            nextActionAt: now,
+                            callHistory: [],
+                            assignedAgent: null,
+                            addedDate: now,
+                            calledDate: null
+                        });
+                        count++;
+                    }
+                    showNotification(`Bulk upload complete: ${count} new leads have been added.`);
+                    progress.classList.add('hidden');
+                    fileInput.value = '';
+                    document.getElementById('bulkLeadFileName').textContent = '';
+                    window.allLeads = []; // Invalidate cache
+                    loadLeads();
+                    updateLeadsStats();
+                } catch (error) {
+                    showNotification('File processing error: ' + error.message, 'error');
+                    progress.classList.add('hidden');
+                }
+            };
+            if (file.name.endsWith('.csv')) reader.readAsText(file);
+            else reader.readAsBinaryString(file);
+        };
+
+        window.loadLeads = async function() {
+            try {
+                if (window.allLeads.length > 0) {
+                    renderLeads(window.allLeads);
+                    return;
+                }
+
+                const q = window.firestore.query(window.firestore.collection(db, 'queueContacts'), window.firestore.orderBy('addedDate', 'desc'));
+                const querySnapshot = await window.firestore.getDocs(q);
+                window.allLeads = [];
+                querySnapshot.forEach(doc => window.allLeads.push({ id: doc.id, ...doc.data() }));
+                renderLeads(window.allLeads);
+            } catch (error) { console.error('Error loading leads:', error); }
+        };
+
+        window.renderLeads = function(leads) {
+            const tbody = document.getElementById('leadsTableBody');
+            tbody.innerHTML = '';
+            if (leads.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No leads found</td></tr>'; return; }
+
+            leads.forEach(lead => {
+                const row = tbody.insertRow();
+                const s = lead.status;
+                const badge = s === 'waiting' ? 'badge-info' : s === 'in-progress' ? 'badge-warning' : (s === 'completed' || s === 'called') ? 'badge-success' : 'badge-danger';
+                row.innerHTML = `
+                    <td><strong>${lead.customerName}</strong></td>
+                    <td>${lead.phoneNumber}</td>
+                    <td><span class="badge badge-info">${lead.queueName}</span></td>
+                    <td><span class="badge ${badge}">${s}</span></td>
+                    <td>${lead.assignedAgent || '-'}</td>
+                    <td>${new Date(lead.addedDate).toLocaleDateString()}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="editLead('${lead.id}')">Edit</button>
+                            <button class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="moveLeadQueue('${lead.id}')">Move</button>
+                            <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteLead('${lead.id}')">Delete</button>
+                        </div>
+                    </td>
+                `;
+            });
+        };
+
+        window.filterLeads = function() {
+            const search = document.getElementById('leadSearch').value.toLowerCase();
+            const queue = document.getElementById('filterLeadQueue').value;
+            const status = document.getElementById('filterLeadStatus').value;
+            const filtered = window.allLeads.filter(l => (l.customerName.toLowerCase().includes(search) || l.phoneNumber.includes(search)) && (!queue || l.queueName === queue) && (!status || l.status === status));
+            renderLeads(filtered);
+        };
+
+        window.updateLeadsStats = async function() {
+            try {
+                const snap = await window.firestore.getDocs(window.firestore.collection(db, 'queueContacts'));
+                let waiting = 0, progress = 0, completed = 0, callbacks = 0;
+                snap.forEach(doc => {
+                    const s = doc.data().status;
+                    if (s === 'waiting') waiting++; 
+                    else if (s === 'in-progress') progress++; 
+                    else if (s === 'completed' || s === 'called') completed++; 
+                    else if (s === 'callback-scheduled') {
+                        if (new Date(doc.data().nextActionAt) <= new Date()) waiting++;
+                        else callbacks++;
+                    }
+                });
+                document.getElementById('leadsWaiting').textContent = waiting;
+                document.getElementById('leadsInProgress').textContent = progress;
+                document.getElementById('leadsCompleted').textContent = completed;
+                document.getElementById('leadsCallbacks').textContent = callbacks;
+            } catch (error) { console.error('Error updating stats:', error); }
+        };
+
+        window.editLead = async (id) => {
+            if (!requireLogin()) return;
+            const l = window.allLeads.find(x => x.id === id); if (!l) return;
+            
+            const data = await showFormOverlay('Edit Lead Details', [
+                { id: 'name', label: 'Customer Name', value: l.customerName, required: true },
+                { id: 'phone', label: 'Phone Number', value: l.phoneNumber, required: true }
+            ]);
+
+            if (data) {
+                await window.firestore.updateDoc(window.firestore.doc(db, 'queueContacts', id), { 
+                    customerName: data.name, 
+                    phoneNumber: data.phone 
+                });
+                showNotification(`Lead details updated for ${data.name}.`);
+                window.allLeads = []; // Invalidate cache
+                loadLeads();
+            }
+        };
+        window.moveLeadQueue = async (id) => {
+            if (!requireLogin()) return;
+            
+            const data = await showFormOverlay('Move to Queue', [
+                { id: 'queue', label: 'Select Target Queue', type: 'text', placeholder: 'Enter queue name', required: true }
+            ]);
+
+            if (data) {
+                await window.firestore.updateDoc(window.firestore.doc(db, 'queueContacts', id), { queueName: data.queue });
+                showNotification(`Lead has been moved to the ${data.queue} queue.`);
+                window.allLeads = []; // Invalidate cache
+                loadLeads();
+            }
+        };
+        window.deleteLead = async (id) => { 
+            if (!requireLogin()) return;
+            if (await showConfirmOverlay('Delete Lead', 'Permanently delete this lead from the system?')) {
+                await window.firestore.deleteDoc(window.firestore.doc(db, 'queueContacts', id));
+                showNotification('Lead record has been deleted.');
+                window.allLeads = []; // Invalidate cache
+                loadLeads();
+                updateLeadsStats();
+            }
+        };
+
+        // QUEUES ACTIONS PROTECTION
+        const originalAddAgent = window.addAgent;
+        window.addAgent = function() { if (requireLogin()) originalAddAgent(); };
+
+        const originalDeleteAgent = window.deleteAgent;
+        window.deleteAgent = function(id) { if (requireLogin()) originalDeleteAgent(id); };
+
+        const originalAddQueue = window.addQueue;
+        window.addQueue = function() { if (requireLogin()) originalAddQueue(); };
+        
+        const originalDeleteQueue = window.deleteQueue;
+        window.deleteQueue = function(id) { if (requireLogin()) originalDeleteQueue(id); };
+
+        const originalAddContact = window.addContact;
+        window.addContact = function() { if (requireLogin()) originalAddContact(); };
+        
+        const originalAssignQueue = window.assignQueueToAgent;
+        window.assignQueueToAgent = function() { if (requireLogin()) originalAssignQueue(); };
+
+        const originalDeleteAssignment = window.deleteAssignment;
+        window.deleteAssignment = function(id) { if (requireLogin()) originalDeleteAssignment(id); };
+
+        const originalUploadScript = window.uploadScript;
+        window.uploadScript = function() { if (requireLogin()) originalUploadScript(); };
+
+        const originalDeleteScript = window.deleteScript;
+        window.deleteScript = function(id) { if (requireLogin()) originalDeleteScript(id); };
+
+        const originalStartCall = window.startCall;
+        window.startCall = function() { if (requireLogin()) originalStartCall(); };
+
+        const originalEndCall = window.endCall;
+        window.endCall = function() { if (requireLogin()) originalEndCall(); };
+
+        const originalSkipCall = window.skipCall;
+        window.skipCall = function() { if (requireLogin()) originalSkipCall(); };
+
+        const originalSaveCallOutcome = window.saveCallOutcome;
+        window.saveCallOutcome = function() { if (requireLogin()) originalSaveCallOutcome(); };
+
+        const originalSearchCalls = window.searchCalls;
+        window.searchCalls = function() { if (requireLogin()) originalSearchCalls(); };
+
+        // Initialize on page load
+    </script>
+</body>
+</html>
