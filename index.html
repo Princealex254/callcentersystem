@@ -1305,6 +1305,10 @@
         window.currentCall = null;
         window.callStartTime = null;
         window.allLeads = [];
+        window.cachedAgents = [];
+        window.cachedQueues = [];
+        window.cachedScripts = [];
+        window.cachedAssignments = [];
 
         // HELPERS FOR UNDERSTANDABLE MESSAGING
         const understandableErrorMessage = (error) => {
@@ -1484,7 +1488,6 @@
                     loadAgentsForSelect('searchAgent');
                     loadQueuesForSelect('searchQueueFilter');
                 } else if (pageName === 'call-page') {
-                    loadAgentsForSelect('agentSelect');
                     updateStats();
                 }
             });
@@ -1615,6 +1618,7 @@
                 }
                 
                 const select = document.getElementById(selectId);
+                if (!select) return;
                 select.innerHTML = '<option value="">-- Select Agent --</option>';
                 
                 window.cachedAgents.forEach(agent => {
@@ -1722,6 +1726,7 @@
                 }
 
                 const select = document.getElementById(selectId);
+                if (!select) return;
                 select.innerHTML = '<option value="">-- Select Queue --</option>';
                 
                 window.cachedQueues.forEach(queue => {
