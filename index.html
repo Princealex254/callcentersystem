@@ -7,20 +7,24 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <style>
         :root {
-            --primary-bg: #0a0e27;
-            --secondary-bg: #141b3d;
-            --accent-bg: #1e2952;
-            --card-bg: #1a2142;
+            --primary-bg: #0b0f2a;
+            --secondary-bg: #0b0f2a;
+            --accent-bg: #151a3f;
+            --card-bg: #151a3f;
             --text-primary: #e8eaf6;
             --text-secondary: #9fa8da;
             --accent-blue: #5c6bc0;
             --accent-green: #26a69a;
             --accent-red: #ef5350;
+            --border-color: rgba(255, 255, 255, 0.08);
             --accent-orange: #ff9800;
-            --border-color: #2a3866;
-            --hover-bg: #253156;
+            --neo-shadow-light: #151b40;
+            --neo-shadow-dark: #070916;
+            --hover-bg: #1f265c;
         }
 
         * {
@@ -45,7 +49,6 @@
         .sidebar {
             width: 280px;
             background: var(--secondary-bg);
-            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             position: fixed;
@@ -53,6 +56,7 @@
             left: 0;
             top: 0;
             z-index: 100;
+            box-shadow: 4px 0 10px var(--neo-shadow-dark);
         }
 
         .logo {
@@ -81,7 +85,8 @@
         }
 
         .nav-item {
-            padding: 0.875rem 1.5rem;
+            padding: 1rem 1.5rem;
+            margin: 0.125rem 0;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -90,6 +95,7 @@
             border-left: 3px solid transparent;
             font-weight: 500;
             font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
         }
 
         .nav-item:hover {
@@ -98,9 +104,10 @@
         }
 
         .nav-item.active {
-            background: var(--accent-bg);
+            background: linear-gradient(90deg, rgba(38, 166, 154, 0.15), transparent);
             border-left-color: var(--accent-green);
             color: var(--accent-green);
+            box-shadow: inset 10px 0 20px -10px rgba(38, 166, 154, 0.5);
         }
 
         .nav-icon {
@@ -137,11 +144,12 @@
         /* Cards */
         .card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            border: none;
             border-radius: 12px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             animation: slideUp 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
         }
 
         .card-header {
@@ -166,11 +174,12 @@
 
         .stat-card {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            border: none;
             border-radius: 12px;
             padding: 1.5rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .stat-card::before {
@@ -211,6 +220,7 @@
             transition: all 0.2s ease;
             font-size: 0.9rem;
             font-family: 'DM Sans', sans-serif;
+            box-shadow: none;
         }
 
         .btn-primary {
@@ -220,8 +230,12 @@
 
         .btn-primary:hover {
             background: #2bbbad;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3);
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+        
+        .btn-call-primary {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #1de9b6 100%) !important;
         }
 
         .btn-secondary {
@@ -231,7 +245,8 @@
 
         .btn-secondary:hover {
             background: #6674ce;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
+            opacity: 0.9;
         }
 
         .btn-danger {
@@ -298,7 +313,7 @@
         .table-container {
             overflow-x: auto;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border: none;
         }
 
         table {
@@ -454,7 +469,7 @@
         /* Script Content Display */
         .script-body-display {
             background: var(--primary-bg);
-            border: 1px solid var(--border-color);
+            border: none;
             border-radius: 8px;
             padding: 1.5rem;
             margin-top: 0.75rem;
@@ -751,7 +766,7 @@
                     <div class="card-header" style="justify-content: center;">
                         <h3 class="card-title">Ready for Your Next Call?</h3>
                     </div>
-                    <button class="btn btn-primary" onclick="getNextCall()" style="font-size: 1.25rem; padding: 1.25rem 3rem; border-radius: 50px; box-shadow: 0 10px 20px rgba(38, 166, 154, 0.2);">
+                    <button class="btn btn-primary btn-call-primary" onclick="getNextCall()" style="font-size: 1.75rem; padding: 1.5rem 4rem; border-radius: 50px;">
                         📞 Get Next Call
                     </button>
                 </div>
@@ -771,6 +786,10 @@
                             <div class="call-info-item">
                                 <div class="call-info-label">Queue</div>
                                 <div class="call-info-value" id="callQueue">-</div>
+                            </div>
+                            <div class="call-info-item">
+                                <div class="call-info-label">Call Duration</div>
+                                <div class="call-info-value" id="activeCallTimer">00:00</div>
                             </div>
                         </div>
 
@@ -1299,6 +1318,7 @@
         let currentAgent = null;
         let currentCall = null;
         let callStartTime = null;
+        let activeTimerInterval = null;
         let allLeads = [];
 
         window.currentAgent = null;
@@ -1446,6 +1466,7 @@
                 document.getElementById('getCallSection').style.display = 'block';
                 showNotification(`Welcome back, ${window.currentAgent}! Your session is active.`);
                 updateStats();
+                updateStats();
             } else {
                 document.getElementById('logged-in-status').classList.add('hidden');
                 document.getElementById('logged-out-status').classList.remove('hidden');
@@ -1522,6 +1543,7 @@
             const email = document.getElementById('agentEmail').value.trim();
             const phone = document.getElementById('agentPhone').value.trim();
             const role = document.getElementById('agentRole').value;
+            const btn = document.getElementById('addAgentBtn');
 
             if (!name || !email || !phone) {
                 showNotification('Agent registration failed: Name, Email, and Phone are required.', 'warning');
@@ -1529,6 +1551,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Adding...';
                 await window.firestore.addDoc(window.firestore.collection(db, 'agents'), {
                     agentName: name,
                     email: email,
@@ -1546,16 +1570,20 @@
                 loadAgents();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Add Agent';
             }
         };
 
         window.loadAgents = async function() {
+            const tbody = document.getElementById('agentsTableBody');
+            if (window.cachedAgents.length > 0) {
+                renderAgentsTable(window.cachedAgents);
+                return;
+            }
+            tbody.innerHTML = '<tr><td colspan="6"><div class="spinner"></div></td></tr>';
             try {
-                const tbody = document.getElementById('agentsTableBody');
-                if (window.cachedAgents.length > 0) {
-                    renderAgentsTable(window.cachedAgents);
-                    return;
-                }
 
                 const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'agents'));
                 
@@ -1636,6 +1664,7 @@
         window.addQueue = async function() {
             const name = document.getElementById('queueName').value.trim();
             const description = document.getElementById('queueDescription').value.trim();
+            const btn = document.getElementById('addQueueBtn');
 
             if (!name || !description) {
                 showNotification('Queue creation failed: Please provide both a name and a description.', 'warning');
@@ -1643,6 +1672,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Adding...';
                 await window.firestore.addDoc(window.firestore.collection(db, 'queues'), {
                     queueName: name,
                     description: description,
@@ -1656,16 +1687,20 @@
                 loadQueues();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Add Queue';
             }
         };
 
         window.loadQueues = async function() {
+            const tbody = document.getElementById('queuesTableBody');
+            if (window.cachedQueues.length > 0) {
+                renderQueuesTable(window.cachedQueues);
+                return;
+            }
+            tbody.innerHTML = '<tr><td colspan="4"><div class="spinner"></div></td></tr>';
             try {
-                const tbody = document.getElementById('queuesTableBody');
-                if (window.cachedQueues.length > 0) {
-                    renderQueuesTable(window.cachedQueues);
-                    return;
-                }
 
                 const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'queues'));
                 
@@ -1745,6 +1780,7 @@
             const customerName = document.getElementById('contactCustomerName').value.trim();
             const phoneNumber = document.getElementById('contactPhoneNumber').value.trim();
             const queueName = document.getElementById('contactQueue').value;
+            const btn = document.getElementById('addContactBtn');
 
             if (!customerName || !phoneNumber || !queueName) {
                 showNotification('Contact data missing: Name, Phone, and Queue selection are required.', 'warning');
@@ -1752,6 +1788,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Adding...';
                 await window.firestore.addDoc(window.firestore.collection(db, 'queueContacts'), {
                     customerName: customerName,
                     phoneNumber: phoneNumber,
@@ -1766,6 +1804,9 @@
                 window.allLeads = []; // Invalidate leads cache
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Add Contact';
             }
         };
 
@@ -1773,6 +1814,7 @@
         window.assignQueueToAgent = async function() {
             const agentName = document.getElementById('assignAgent').value;
             const queueName = document.getElementById('assignQueue').value;
+            const btn = document.getElementById('assignQueueBtn');
 
             if (!agentName || !queueName) {
                 showNotification('Assignment failed: You must select both an agent and a queue.', 'warning');
@@ -1780,6 +1822,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Assigning...';
                 // Check if assignment already exists
                 const q = window.firestore.query(
                     window.firestore.collection(db, 'agentQueues'),
@@ -1804,16 +1848,20 @@
                 loadAssignments();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Assign Queue';
             }
         };
 
         window.loadAssignments = async function() {
+            const tbody = document.getElementById('assignmentsTableBody');
+            if (window.cachedAssignments.length > 0) {
+                renderAssignmentsTable(window.cachedAssignments);
+                return;
+            }
+            tbody.innerHTML = '<tr><td colspan="4"><div class="spinner"></div></td></tr>';
             try {
-                const tbody = document.getElementById('assignmentsTableBody');
-                if (window.cachedAssignments.length > 0) {
-                    renderAssignmentsTable(window.cachedAssignments);
-                    return;
-                }
 
                 const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'agentQueues'));
                 
@@ -1872,6 +1920,7 @@
             const queueName = document.getElementById('scriptQueue').value;
             const description = document.getElementById('scriptDescription').value.trim();
             const scriptBody = document.getElementById('scriptBody').value.trim();
+            const btn = document.getElementById('saveScriptBtn');
 
             if (!scriptName || !queueName || !scriptBody) {
                 showNotification('Script upload failed: Name, Queue and Content are required.', 'warning');
@@ -1879,6 +1928,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Saving...';
                 // Save directly to Firestore
                 await window.firestore.addDoc(window.firestore.collection(db, 'scripts'), {
                     scriptName: scriptName,
@@ -1897,16 +1948,20 @@
                 loadScripts();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save Script';
             }
         };
 
         window.loadScripts = async function() {
+            const tbody = document.getElementById('scriptsTableBody');
+            if (window.cachedScripts.length > 0) {
+                renderScriptsTable(window.cachedScripts);
+                return;
+            }
+            tbody.innerHTML = '<tr><td colspan="5"><div class="spinner"></div></td></tr>';
             try {
-                const tbody = document.getElementById('scriptsTableBody');
-                if (window.cachedScripts.length > 0) {
-                    renderScriptsTable(window.cachedScripts);
-                    return;
-                }
 
                 const querySnapshot = await window.firestore.getDocs(window.firestore.collection(db, 'scripts'));
                 
@@ -2089,6 +2144,7 @@
                 document.getElementById('callPhoneNumber').textContent = foundContact.phoneNumber;
                 document.getElementById('callQueue').textContent = foundContact.queueName;
                 document.getElementById('callScriptName').textContent = scriptName;
+                document.getElementById('activeCallTimer').textContent = '00:00';
                 document.getElementById('callScriptText').innerHTML = scriptBody;
 
                 document.getElementById('activeCallSection').style.display = 'block';
@@ -2113,9 +2169,29 @@
             document.getElementById('startCallBtn').style.display = 'none';
             document.getElementById('endCallBtn').style.display = 'inline-block';
             showNotification('Call timer started.');
+
+            // Initialize Live Timer
+            const timerDisplay = document.getElementById('activeCallTimer');
+            timerDisplay.style.color = ''; // Reset color
+            activeTimerInterval = setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - window.callStartTime) / 1000);
+                const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+                const secs = String(diff % 60).padStart(2, '0');
+                timerDisplay.textContent = `${mins}:${secs}`;
+                
+                // AHT Warning: Turn red if over 5 minutes (300 seconds)
+                if (diff >= 300) {
+                    timerDisplay.style.color = 'var(--accent-red)';
+                }
+            }, 1000);
         };
 
         window.endCall = function() {
+            if (activeTimerInterval) {
+                clearInterval(activeTimerInterval);
+                activeTimerInterval = null;
+            }
             document.getElementById('callOutcomeSection').style.display = 'block';
             document.getElementById('endCallBtn').style.display = 'none';
             showNotification('Call ended. Please record the outcome below to proceed.');
@@ -2149,9 +2225,15 @@
         window.saveCallOutcome = async function() {
             const outcome = document.getElementById('callOutcome').value;
             const notes = document.getElementById('callNotes').value.trim();
+            const btn = document.getElementById('saveCallOutcomeBtn');
 
             if (!outcome) {
                 showNotification('Outcome missing: You must select a result before saving.', 'warning');
+                return;
+            }
+
+            if (!notes) {
+                showNotification('Data Integrity Error: You must enter call notes before disposing.', 'warning');
                 return;
             }
 
@@ -2192,6 +2274,8 @@
             }
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Saving...';
                 const callEndTime = new Date();
                 const duration = Math.floor((callEndTime - window.callStartTime) / 1000);
                 const timestamp = new Date().toISOString();
@@ -2231,24 +2315,32 @@
                 document.getElementById('callNotes').value = '';
                 window.currentCall = null;
                 window.callStartTime = null;
+
+                // Disposition Rule: Only show the "Get Next Call" section once current call is saved
+                document.getElementById('getCallSection').style.display = 'block';
+                
                 window.allLeads = []; // Invalidate leads cache
 
                 // Update stats
                 updateStats();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save Call Record';
             }
         };
 
         // CALL HISTORY
         window.loadCallHistory = async function() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '<tr><td colspan="8"><div class="spinner"></div></td></tr>';
             try {
                 const q = window.firestore.query(
                     window.firestore.collection(db, 'calls'),
                     window.firestore.orderBy('timestamp', 'desc')
                 );
                 const querySnapshot = await window.firestore.getDocs(q);
-                const tbody = document.getElementById('historyTableBody');
                 
                 if (querySnapshot.empty) {
                     tbody.innerHTML = `
@@ -2295,8 +2387,12 @@
             const phoneSearch = document.getElementById('searchPhone').value.trim();
             const agentSearch = document.getElementById('searchAgent').value;
             const queueSearch = document.getElementById('searchQueueFilter').value;
+            const tbody = document.getElementById('historyTableBody');
+            const btn = document.getElementById('searchCallsBtn');
 
             try {
+                btn.disabled = true;
+                btn.innerHTML = '⌛ Searching...';
                 let q = window.firestore.collection(db, 'calls');
                 const constraints = [];
 
@@ -2314,7 +2410,6 @@
                 }
 
                 const querySnapshot = await window.firestore.getDocs(q);
-                const tbody = document.getElementById('historyTableBody');
                 tbody.innerHTML = '';
 
                 let found = 0;
@@ -2363,6 +2458,9 @@
                 showNotification(`Search complete: ${found} call record(s) found.`);
             } catch (error) {
                 showNotification('Error searching calls: ' + error.message, 'error');
+           } finally {
+               btn.disabled = false;
+               btn.innerHTML = 'Search';
             }
         };
 
@@ -2426,12 +2524,16 @@
             const queue = document.getElementById('leadQueue').value;
             const notes = document.getElementById('leadNotes').value.trim();
 
+           const submitBtn = document.getElementById('addLeadBtn');
+
             if (!name || !phone || !queue) {
                 showNotification('Lead data missing: Name, Phone, and Queue assignment are required.', 'warning');
                 return;
             }
 
             try {
+               submitBtn.disabled = true;
+               submitBtn.innerHTML = '⌛ Adding...';
                 const now = new Date().toISOString();
                 await window.firestore.addDoc(window.firestore.collection(db, 'queueContacts'), {
                     customerName: name,
@@ -2460,6 +2562,9 @@
                 updateLeadsStats();
             } catch (error) {
                 showNotification(understandableErrorMessage(error), 'error');
+           } finally {
+               submitBtn.disabled = false;
+               submitBtn.innerHTML = 'Add Lead';
             }
         };
 
@@ -2471,8 +2576,11 @@
 
             const progress = document.getElementById('uploadProgress');
             const statusLabel = document.getElementById('uploadStatus');
+           const uploadBtn = document.getElementById('uploadLeadsBtn');
+
             progress.classList.remove('hidden');
             statusLabel.textContent = 'Reading file...';
+           uploadBtn.disabled = true;
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -2535,12 +2643,14 @@
         };
 
         window.loadLeads = async function() {
+           const tbody = document.getElementById('leadsTableBody');
             try {
                 if (window.allLeads.length > 0) {
                     renderLeads(window.allLeads);
                     return;
                 }
 
+               tbody.innerHTML = '<tr><td colspan="7"><div class="spinner"></div></td></tr>';
                 const q = window.firestore.query(window.firestore.collection(db, 'queueContacts'), window.firestore.orderBy('addedDate', 'desc'));
                 const querySnapshot = await window.firestore.getDocs(q);
                 window.allLeads = [];
@@ -2552,7 +2662,16 @@
         window.renderLeads = function(leads) {
             const tbody = document.getElementById('leadsTableBody');
             tbody.innerHTML = '';
-            if (leads.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No leads found</td></tr>'; return; }
+            if (leads.length === 0) { 
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">📂</div>
+                            <div>No leads yet. Upload a CSV or add manually to start.</div>
+                        </td>
+                    </tr>`; 
+                return; 
+            }
 
             leads.forEach(lead => {
                 const row = tbody.insertRow();
